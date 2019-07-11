@@ -1,0 +1,20 @@
+webpack安装：
+npm i -g webpack
+
+淘宝镜像（cnpm)
+1>安装：npm install -g cnpm --registry=https://registry.npm.taobao.org
+2>原因：npm的服务器在美国，还有强大的防火墙作用，导致有些模块无法使用下载，这时需要用淘宝镜像来解决，命令cnpm与npm一样的用法，但下载速度比npm速度更快，更好解局。
+
+yarn(Yarn是facebook发布的一款取代npm的包管理工具)
+优点
+1>速度超快。 Yarn 缓存了每个下载过的包，所以再次使用时无需重复下载。 同时利用并行下载以最大化资源利用率，因此安装速度更快。
+2>超级安全。 在执行代码之前，Yarn 会通过算法校验每个安装包的完整性。
+3>超级可靠。 使用详细、简洁的锁文件格式和明确的安装算法，Yarn 能够保证在不同系统上无差异的工作。
+
+Yarn的常用命令：
+1>安装：cnpm install -g yarn
+2>查看版本号：yarn --version
+3>安装依赖：yarn add  name
+4>删除依赖：yarn remove name
+5>npm i name -D(-save-dev) 改为 yarn add name -dev
+6>全局安装：yarn global add name
