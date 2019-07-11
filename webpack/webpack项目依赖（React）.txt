@@ -1,0 +1,33 @@
+webpack项目依赖(已安装React为主)：
+1>npm i(install) name -S(-save)：自动把模块和版本号添加到devdepencies（简称dev，即开发环境中要用到的）
+2>npm i name -D(-save-dev)：自动把模块和版本号添加到dependencies（简称dep，即生产环境中要用到的）
+
+3>npm init -y：创建package.json文件
+4>npm i -D webpack：安装webpack依赖
+5>npm i -D webpack-cli：安装脚手架
+
+6>npm i -D html-webpack-plugin：安装生成Html文件的插件
+7>npm i -S react react-dom@7.1.5：安装reaact依赖
+8>npm i -D babel-loader babel-core：安装识别JSX的库的loader
+9>npm i -D babel-preset-react：安装处理JSX代码的预设
+
+10>npm i -D webpack-dev-server：安装devServer（开发时的服务器）
+注：运行 npm start (start在package.json中的“script”中写的，对应的内容为webpack-dev-server)
+
+11>npm i -D css-loader@0.28.11 style-loader：安装css依赖
+12>npm i -S font-awesome(字体库)：安装字体依赖
+13>npm i -D file-loader：安装图片依赖
+注：会把图片的名称生成自定义，并且在打包后把图片移出来
+14>npm i -D url-loader：安装file-loader的升级版url-loader依赖
+注：可增加于减少图片的请求(但图片要小)
+
+15>npm i -D sass-loader node-sass@4.5.3：安装sass依赖
+16>npm i -D less-loader less@3.0.0：安装less依赖
+
+17>npm i -D babel-preset-env：安装env（只要是发布的es语法到能被编译成es5）预设
+18>npm i -D  babel-plugin-transform-object-rest-spread：安装和成对象（Object.assign于的React）
+19>npm i -D clean-webpack-plugin：安装清除原打包的插件
+
+注：a.@是版本号，在node高版本中，模块无法正常运行
+ b.运行：npm run dev("dev"也是package.json中的script写的，对应在“webpack”)
+ c.配置文件名必须为：webpack.config.js，如果不是这样的文件名，在配置中到加上这个新的文件名
