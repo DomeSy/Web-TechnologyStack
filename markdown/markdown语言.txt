@@ -1,0 +1,20 @@
+Markdown语言：
+1>轻量级标记语言
+2>以纯文本形式(易读、易写、易更改)编写文档，并最终以HTML格式发布。
+3>Markdown也可以理解为将以MARKDOWN语法编写的语言转换成HTML内容的工具。
+4>以.md的后缀名文件夹
+
+使用Markdown的好处：
+1>它是易读（看起来舒服）、易写（语法简单）、易更改纯文本。处处体现着极简主义的影子
+2>兼容HTML，可以转换为HTML格式发布
+3>跨平台使用
+4>越来越多的网站支持Markdown
+5>更方便清晰地组织你的电子邮件
+
+在vscode使用:
+1>插件：Markdown Preview Enhanced 支持渲染代码的运行结果。
+  markdownlint:用于Visual Studio代码的Markdown / CommonMark linting和样式检查
+  Maridown pdf:插件可以简单的将编写的.md文件转换成其他格式的文件，一样地，在插件库中搜索安装 Maridown pdf 插件即可使用。
+
+语法：gitHub中
+
