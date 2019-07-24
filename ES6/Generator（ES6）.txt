@@ -1,0 +1,94 @@
+Generator:
+1>声明：function* (function后面加一个*) 这种声明方式会定义成一个生成器函数(generator function)，它返回一个 Generator 对象。
+2>定义生成器函数：
+function* g() {
+   yield 'a',
+   yield 'b',
+   yield 'c',
+   return 'ending';
+}
+// 返回Generator对象
+console.log(g());           // g {<suspended>}   (挂载状态，里面的根本没有执行)
+console.log(g().toString()); // [ object Generator ] (没有实际的意义)
+3>生成器函数在执行时能暂停，后面又能从暂停处继续执行（可控制是否执行，控制性增强）
+const gen = g();
+console.log(gen.next());   // {value: "a", done: false}
+console.log(gen.next());   // {value: "b", done: false}
+console.log(gen.next());   // {value: "c", done: false}
+console.log(gen.next());   // {value: "ending", done: true}
+注：a. gen.next():依次执行
+ b.value的值是 yield 关键字后面的表达式的值（return 也是）
+ c. done 为 false 代表未执行完，为true代表执行完成
+ d.不再是同步的代码，而是异步的，线性当时，解决异步问题
+4>利用递归执行生成器的所有步骤
+function next() {
+     let {value, done} = gen.next();
+     console.log(value);  // 依次打印 a b c ending
+     if(!done)
+ next();    // 直到全部打印完成
+}
+next();
+5>利用for   of   执行生成器的所有步骤
+for(let value of gen){
+console.log(value); //依次打印 a b c
+}
+注：不能打印return的数
+6>参数的传递
+function* say() {
+  let a = yield '1';
+  console.log(a)
+  let b = yield '2';
+  console.log(b)
+}
+
+let it = say(); // 返回迭代器
+
+// a的值并非该返回值，而是下次next参数
+console.log(it.next()); // 输出 { value: '1', done: false }
+
+ // '我是被传进来的1'
+// { value: '2', done: false } (自身的返回值)
+console.log(it.next('我是被传进来的1')); 
+                                         
+ // '我是被传进来的2'                               
+// { value: undefined, done: false } (自身的返回值)
+console.log(it.next('我是被传进来的2')); 
+
+注：a.每次执行next，只执行 yield 后面的部分
+       b.第一次的next()传参是无效果的，第二次传进来的其实是等于yield '1'的前半部分，实际上复制给了a
+7>结合Promise使用generator
+// 使用Generation顺序执行两次异步操作
+function* r(num) {
+  const r1 = yield compute(num);
+  yield compute(r1);
+} 
+
+// compute为异步操作，结合Promise使用可以轻松实现异步操作队列
+function compute(num) {
+  return new Promise(resolve => {
+    setTimeout(()=>{
+      const ret = num * num;
+      console.log(ret);  //输出处理结果   第一次为4，第二次为16
+      resolve(ret); //操作成功
+    }, 1000);
+  });
+}
+
+// 不使用递归函数调用
+let it = r(2); //初始化的时候传参
+
+//第一种
+// it.next().value.then(num => it.next(num));
+
+// 修改为可处理Promise的next
+function next(data) {
+  let { value, done } = it.next(data);
+
+  if(!done) {
+    value.then(num => {
+      next(num);
+    });
+  }
+}
+
+next();
