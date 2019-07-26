@@ -1,0 +1,29 @@
+new 的原理是什么？通过 new 的方式创建对象和通过字面量创建有什么区别？
+1>在调用 new 的过程中会发生以上四件事情：
+a.新生成了一个对象
+b.链接到原型
+c.绑定 this
+d.返回新对象
+2>可以自己实现一个new,如：
+function create() {
+  let obj = {}
+  let Con = [].shift.call(arguments)
+  obj.__proto__ = Con.prototype
+  let result = Con.apply(obj, arguments)
+  return result instanceof Object ? result : obj
+}
+注：以下是对实现的分析：
+a.创建一个空对象
+b.获取构造函数
+c.设置空对象的原型
+d.绑定 this 并执行构造函数
+e.确保返回值为对象
+3>对于对象来说，其实都是通过 new 产生的，无论是 function Foo() 还是 let a = { b : 1 } 。
+ 4>列如
+function Foo() {}
+// function 就是个语法糖
+// 内部等同于 new Function()
+let a = { b: 1 }
+// 这个字面量内部也是使用了 new Object()
+如：a.对于创建一个对象来说，更推荐使用字面量的方式创建对象（无论性能上还是可读性）。
+b.因为你使用 new Object() 的方式创建对象需要通过作用域链一层层找到 Object，但是你使用字面量的方式就没这个问题。
