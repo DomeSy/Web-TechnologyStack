@@ -1,0 +1,93 @@
+原型：
+1>定义：原型是一个可以被复制（或者叫克隆）的一个类，通过复制原型可以创建一个一模一样的新对象。
+通俗的说，原型就是一个模板，在设计语言中更准确的说是一个对象模板。
+2>理解原型，如：
+var Person = function(name){
+    this.name = name;
+}
+            
+Person.prototype.sayHi = function(){
+    console.log("Hello! I am " + this.name + ".");
+}
+            
+var joe = new Person("joe");
+var john = new Person("john");
+            
+joe.sayHi();    //Hello! I am joe.
+john.sayHi();   //Hello! I am john.
+注：a.从上面的代码可以看出来，原型（Person）定义了一些公用的属性和方法；
+ b.利用原型（Person）创建出来的新对象实例（joe和john对象）会共享原型（Person）的所有属性和方法。
+2>将代码做以下修改
+"use strict";
+
+var Person = function(name){
+    this.name = name;
+}
+            
+var joe = new Person("joe");
+var john = new Person("john");
+
+Person.prototype.sayHi = function(){
+    console.log("Hello! I am " + this.name + ".");
+}
+            
+joe.sayHi();    //Hello! I am joe.
+john.sayHi();   //Hello! I am john.
+注：a.这次把新创建的对象（joe和John）提前到原型（Person）的sayHi方法定义之前，并使用严格模式。
+ b.原型（Person）的sayHi方法依然会被共享出去，所以原型（Person）的属性和方法总是被原型实例所共享。
+3>再次修改后
+var Person = function(name){
+    this.name = name;
+}
+
+Person.prototype.sayHi = function(){
+    console.log("Hello! I am " + this.name + ".");
+}
+
+var joe = new Person("joe");
+var john = new Person("john");
+
+joe.sayHi();    //Hello! I am joe.
+john.sayHi();   //Hello! I am john.
+
+joe.getName = function(){
+    console.log(this.name);
+}
+
+joe.getName();    //joe
+john.getName();   //undefined
+注：这次为新对象实例（joe)添加getName方法，最后只有实例（joe)拥有该方法，而另一个实例（john）并没有getName方法，这说明：通过原型创建的新对象实例是相互独立的。也正是因为这样对象的使用才能更加灵活、更加易于扩展。
+
+原型链：
+1>定义：在javascript中，所有的对象都拥有一个__proto__属性指向该对象的原型（prototype)。
+2>在上面的代码中，执行console.log(joe.__proto__)后在控制台可以看到输出了原型（Person），然后继续执行console.log(Person.__proto__)，控制台打印的结果是function(){}，Person的原型是function,这是因为Person是一个构造函数，它的本质就是一个函数。
+3>在javascript中函数是一等对象。
+a.现在用箭头符号来表示上面原型创建的过程：
+joe.__proto__  =>  Person,
+Person.__proto__  =>  function(){}
+b.由此可见，原型链记录了原型对象创建的整个过程，因此，我给原型链添加一个概念：原型链是原型对象创建过程的历史记录。
+
+如何理解原型？如何理解原型链？
+当创建一个对象时，如： let obj = { age: 25 }，可以发现能使用很多种函数，但是我们明明没有定义过它们，这是为什么呢？
+a.在浏览器中打印 obj 时你会发现，在 obj 上有一个 __proto__ 属性，那么就与这个属性有关系。
+
+
+b.其实每个 JS 对象都有 __proto__ 属性，这个属性指向了原型。
+c.这个属性在现在来说已经不推荐直接去使用它了，这只是浏览器在早期为了让我们访问到内部属性 [[prototype]] 来实现的一个东西。
+d._prpto_属性存在的东西：
+
+e.通过以上来看，原型也是一个对象，并且这个对象中包含了很多函数，所以我们可以得出一个结论：
+对于 obj 来说，可以通过 __proto__ 找到一个原型对象，在该对象中定义了很多函数让我们来使用。
+f.在上面的图中我们还可以发现一个 constructor 属性，也就是构造函数
+g.打开 constructor 属性我们又可以发现其中还有一个 prototype 属性，并且这个属性对应的值和先前我们在 __proto__ 中看到的一模一样。
+所以我们又可以得出一个结论：
+原型的 constructor 属性指向构造函数，构造函数又通过 prototype 属性指回原型，但是并不是所有函数都具有这个属性，如：Function.prototype.bind() 就没有这个属性。
+h.其实原型就是那么简单，接下来我们再来看一张图，相信这张图能让你彻底明白原型和原型链
+
+i:通过上图，可以知道，其实原型链就是多个对象通过 __proto__ 的方式连接了起来。为什么 obj 可以访问到 valueOf 函数，就是因为 obj 通过原型链找到了 valueOf 函数。
+
+j.总结
+1>Object 是所有对象的爸爸，所有对象都可以通过 __proto__ 找到它
+2>Function 是所有函数的爸爸，所有函数都可以通过 __proto__ 找到它
+3>函数的 prototype 是一个对象
+4>对象的 __proto__ 属性指向原型， __proto__ 将对象和原型连接起来组成了原型链
