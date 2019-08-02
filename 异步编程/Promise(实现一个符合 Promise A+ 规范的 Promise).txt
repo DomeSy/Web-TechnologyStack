@@ -1,0 +1,125 @@
+实现一个符合 Promise/A+ 规范的 Promise
+1>改造一下 resolve 和 reject 函数
+function resolve(value) {
+  if (value instanceof MyPromise) {
+    return value.then(resolve, reject)
+  }
+  setTimeout(() => {
+    if (that.state === PENDING) {
+      that.state = RESOLVED
+      that.value = value
+      that.resolvedCallbacks.map(cb => cb(that.value))
+    }
+  }, 0)
+}
+function reject(value) {
+  setTimeout(() => {
+    if (that.state === PENDING) {
+      that.state = REJECTED
+      that.value = value
+      that.rejectedCallbacks.map(cb => cb(that.value))
+    }
+  }, 0)
+}
+a.对于 resolve 函数来说，首先需要判断传入的值是否为 Promise 类型
+b.为了保证函数执行顺序，需要将两个函数体代码使用 setTimeout 包裹起来
+2>接下来继续改造 then 函数中的代码，首先我们需要新增一个变量 promise2，因为每个 then 函数都需要返回一个新的 Promise 对象，该变量用于保存新的返回对象，然后我们先来改造判断等待态的逻辑
+if (that.state === PENDING) {
+  return (promise2 = new MyPromise((resolve, reject) => {
+    that.resolvedCallbacks.push(() => {
+      try {
+        const x = onFulfilled(that.value)
+        resolutionProcedure(promise2, x, resolve, reject)
+      } catch (r) {
+        reject(r)
+      }
+    })
+
+    that.rejectedCallbacks.push(() => {
+      try {
+        const x = onRejected(that.value)
+        resolutionProcedure(promise2, x, resolve, reject)
+      } catch (r) {
+        reject(r)
+      }
+    })
+  }))
+}
+a.首先我们返回了一个新的 Promise 对象，并在 Promise 中传入了一个函数
+b.函数的基本逻辑还是和之前一样，往回调数组中 push 函数
+c.同样，在执行函数的过程中可能会遇到错误，所以使用了 try...catch 包裹
+d.规范规定，执行 onFulfilled 或者 onRejected 函数时会返回一个 x，并且执行 Promise 解决过程，这是为了不同的 Promise 都可以兼容使用，比如 JQuery 的 Promise 能兼容 ES6 的 Promise
+3>接下来我们改造判断执行态的逻辑
+if (that.state === RESOLVED) {
+  return (promise2 = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        const x = onFulfilled(that.value)
+        resolutionProcedure(promise2, x, resolve, reject)
+      } catch (reason) {
+        reject(reason)
+      }
+    })
+  }))
+}
+a.其实大家可以发现这段代码和判断等待态的逻辑基本一致，无非是传入的函数的函数体需要异步执行，这也是规范规定的
+b.对于判断拒绝态的逻辑这里就不一一赘述了，留给大家自己完成这个作业
+4>最后，当然也是最难的一部分，也就是实现兼容多种 Promise 的 resolutionProcedure 函数
+function resolutionProcedure(promise2, x, resolve, reject) {
+  if (promise2 === x) {
+    return reject(new TypeError('Error'))
+  }
+}
+a.首先规范规定了 x 不能与 promise2 相等，这样会发生循环引用的问题，比如如下代码
+let p = new MyPromise((resolve, reject) => {
+  resolve(1)
+})
+let p1 = p.then(value => {
+  return p1
+})
+然后需要判断 x 的类型
+if (x instanceof MyPromise) {
+    x.then(function(value) {
+        resolutionProcedure(promise2, value, resolve, reject)
+    }, reject)
+}
+b.这里的代码是完全按照规范实现的。如果 x 为 Promise 的话，需要判断以下几个情况：
+1)如果 x 处于等待态，Promise 需保持为等待态直至 x 被执行或拒绝
+2)如果 x 处于其他状态，则用相同的值处理 Promise
+3)当然以上这些是规范需要我们判断的情况，实际上我们不判断状态也是可行的。
+
+c.接下来我们继续按照规范来实现剩余的代码
+let called = false
+if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
+  try {
+    let then = x.then
+    if (typeof then === 'function') {
+      then.call(
+        x,
+        y => {
+          if (called) return
+          called = true
+          resolutionProcedure(promise2, y, resolve, reject)
+        },
+        e => {
+          if (called) return
+          called = true
+          reject(e)
+        }
+      )
+    } else {
+      resolve(x)
+    }
+  } catch (e) {
+    if (called) return
+    called = true
+    reject(e)
+  }
+} else {
+  resolve(x)
+}
+1)首先创建一个变量 called 用于判断是否已经调用过函数
+2)然后判断 x 是否为对象或者函数，如果都不是的话，将 x 传入 resolve 中
+3)如果 x 是对象或者函数的话，先把 x.then 赋值给 then，然后判断 then 的类型，如果不是函数类型的话，就将 x 传入 resolve 中
+4)如果 then 是函数类型的话，就将 x 作为函数的作用域 this 调用之，并且传递两个回调函数作为参数，第一个参数叫做 resolvePromise ，第二个参数叫做 rejectPromise，两个回调函数都需要判断是否已经执行过函数，然后进行相应的逻辑
+5)以上代码在执行的过程中如果抛错了，将错误传入 reject 函数中
