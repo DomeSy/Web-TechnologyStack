@@ -1,0 +1,14 @@
+Event Loop：
+1>定义：一个循环 每次循环叫tick 每次循环的代码叫task
+a.V8引擎单线程无法同时干两件事
+b.文件读取、网络IO缓慢且具有不确定性
+c.要通过异步回调方式处理又称为异步IO
+d.先同步再异步 异步放入队列等同步完成后在执行 每次循环叫一个tick
+(process.nextTick())
+2>
+
+ 	while (eventLoop.waitForTask()) {
+    eventLoop.processNextTask()
+}
+
+ 
