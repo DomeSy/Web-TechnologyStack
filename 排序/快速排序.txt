@@ -1,0 +1,45 @@
+快速排序
+1>原理：
+a.随机选取一个数组中的值作为基准值，从左至右取值与基准值对比大小。
+b.比基准值小的放数组左边，大的放右边，对比完成后将基准值和第一个比基准值大的值交换位置。
+c.然后将数组以基准值的位置分为两部分，继续递归以上操作。
+
+2>实现
+function sort(array) {
+  if (!checkArray(array)) return
+  quickSort(array, 0, array.length - 1);
+  return array;
+}
+
+function quickSort(array, left, right) {
+  if (left < right) {
+    swap(array, , right)
+    // 随机取值，然后和末尾交换，这样做比固定取一个位置的复杂度略低
+    let indexs = part(array, parseInt(Math.random() * (right - left + 1)) + left, right);
+    quickSort(array, left, indexs[0]);
+    quickSort(array, indexs[1] + 1, right);
+  }
+}
+function part(array, left, right) {
+  let less = left - 1;
+  let more = right;
+  while (left < more) {
+    if (array[left] < array[right]) {
+      // 当前值比基准值小，`less` 和 `left` 都加一
+	   ++less;
+       ++left;
+    } else if (array[left] > array[right]) {
+      // 当前值比基准值大，将当前值和右边的值交换
+      // 并且不改变 `left`，因为当前换过来的值还没有判断过大小
+      swap(array, --more, left);
+    } else {
+      // 和基准值相同，只移动下标
+      left++;
+    }
+  }
+  // 将基准值和比基准值大的第一个值交换位置
+  // 这样数组就变成 `[比基准值小, 基准值, 比基准值大]`
+  swap(array, right, more);
+  return [less, more];
+}
+3>该算法的复杂度和归并排序是相同的，但是额外空间复杂度比归并排序少，只需 O(logN)，并且相比归并排序来说，所需的常数时间也更少。
