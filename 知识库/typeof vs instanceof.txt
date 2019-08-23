@@ -1,0 +1,30 @@
+typeof vs instanceof
+1>问题：typeof 是否能正确判断类型？instanceof 能正确判断对象的原理是什么？
+2>typeof 对于原始类型来说，除了 null 都可以显示正确的类型
+a.typeof 1 // 'number'
+b.typeof '1' // 'string'
+c.typeof undefined // 'undefined'
+d.typeof true // 'boolean'
+e.typeof Symbol() // 'symbol'
+3>typeof 对于对象来说，除了函数都会显示 object，所以说 typeof 并不能准确判断变量到底是什么类型
+a.typeof [] // 'object'
+b.typeof {} // 'object'
+c.typeof console.log // 'function'
+4>如果我们想判断一个对象的正确类型，这时候可以考虑使用 instanceof，因为内部机制是通过原型链来判断的，在后面的章节中我们也会自己去实现一个 instanceof。
+const Person = function() {}
+const p1 = new Person()
+p1 instanceof Person // true
+
+var str = 'hello world'
+str instanceof String // false
+
+var str1 = new String('hello world')
+str1 instanceof String // true
+5>对于原始类型来说，你想直接通过 instanceof 来判断类型是不行的，当然我们还是有办法让 instanceof 判断原始类型的
+class PrimitiveString {
+  static [Symbol.hasInstance](x) {
+    return typeof x === 'string'
+  }
+}
+console.log('hello world' instanceof PrimitiveString) // true
+6>Symbol.hasInstance 就是一个能让我们自定义 instanceof 行为的东西，以上代码等同于 typeof 'hello world' === 'string'，所以结果自然是 true 了。这其实也侧面反映了一个问题， instanceof 也不是百分之百可信的。
