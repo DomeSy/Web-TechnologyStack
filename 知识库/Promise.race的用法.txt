@@ -1,0 +1,20 @@
+Promise.race的用法
+const firstPromise = new Promise((res, rej) => {
+  setTimeout(res, 500, "one");
+})
+
+const secondPromise = new Promise((res, rej) => {
+  setTimeout(res, 100, "two");
+})
+
+Promise.race([firstPromise, secondPromise])
+  .then(res => console.log(res));
+  
+A: "one"
+B: "two"
+C: "two""one"
+D: "one""two"
+解
+1>当我们向 Promise.race方法中传入多个 Promise时，会进行 优先 解析（注：只要有一个成功或失败，就立马结束）。
+2>在这个例子中，我们用 setTimeout给 firstPromise和 secondPromise分别设定了500ms和100ms的定时器。这意味着secondPromise会首先解析出字符串 two。
+3>那么此时 res参数即为 two，是为输出结果。
