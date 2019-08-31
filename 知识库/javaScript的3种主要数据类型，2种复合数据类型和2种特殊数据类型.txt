@@ -1,0 +1,6 @@
+javaScript的3种主要数据类型，2种复合数据类型和2种特殊数据类型
+主要数据类型：string, boolean, number
+
+复合数据类型：function, object
+
+特殊类型：undefined，null
