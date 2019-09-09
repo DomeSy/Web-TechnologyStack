@@ -1,0 +1,5 @@
+强缓存
+1>强缓存是利用 http 头中的 Expires 和 Cache-Control 两个字段来控制的。强缓存中，当请求再次发出时，浏览器会根据其中的 expires 和 cache-control 判断目标资源是否“命中”强缓存，若命中则直接从缓存中获取资源，不会再与服务端发生通信。
+2>是否足够新鲜时期：
+a.通过 Expires: XXXX XXX XXX GMT （绝对日期时间，http/1.0） 或者 Cache-Control:max-age=XXXX （相对日期时间，http/1.1）在文档标明过期日期。
+b.Cache-Control 相对于 expires 更加准确，它的优先级也更高。当 Cache-Control 与 expires 同时出现时，我们以 Cache-Control 为准。
